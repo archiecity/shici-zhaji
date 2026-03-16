@@ -1,0 +1,26 @@
+{
+  "total": 1,
+  "shardSize": 500,
+  "shards": [
+    {
+      "file": "examples/sample-shard.json",
+      "index": 0,
+      "count": 1,
+      "size": 256
+    }
+  ],
+  "dynasties": [
+    "唐"
+  ],
+  "authors": [
+    "李白"
+  ],
+  "tags": [
+    "思乡",
+    "月夜"
+  ],
+  "sources": [
+    "sample"
+  ],
+  "generatedAt": "2026-03-16T00:00:00.000Z"
+}

@@ -1,7 +1,17 @@
 node_modules/
 .next/
-data/
-public/
 .env*
 *.log
 *.tsbuildinfo
+
+# Large or sensitive data artifacts
+data/**/*.json
+data/**/*.zip
+public/data/**/*.json
+public/data/**/*.zip
+
+# Keep small sample files for repository demo
+!data/examples/
+!data/examples/**
+!public/data/examples/
+!public/data/examples/**
