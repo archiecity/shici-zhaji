@@ -29,7 +29,7 @@
         ]
       }
     ],
-    "signAndEditExecutable": true
+    "signAndEditExecutable": false
   },
   "nsis": {
     "installerIcon": "build/icon.ico",

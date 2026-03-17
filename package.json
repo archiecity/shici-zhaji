@@ -19,7 +19,7 @@
     "prepare:desktop-static-runtime": "node scripts/prepare-desktop-static-runtime.js",
     "package:win": "npm run build:index:sqlite && npm run build:web:desktop-static && npm run prepare:desktop-static-runtime && electron-builder --config electron-builder.static.json --win nsis --x64",
     "package:win:portable": "npm run build:index:sqlite && npm run build:web:desktop-static && npm run prepare:desktop-static-runtime && electron-builder --config electron-builder.static.json --win portable --x64",
-    "package:win:zip": "npm run build:index:sqlite && npm run build:web:desktop-static && npm run prepare:desktop-static-runtime && electron-builder --config electron-builder.static.json --win zip --x64",
+    "package:win:zip": "npm run build:index:sqlite && npm run build:web:desktop-static && npm run prepare:desktop-static-runtime && node scripts/package-win-zip.js",
     "package:win:dir": "npm run build:index:sqlite && npm run build:web:desktop-static && npm run prepare:desktop-static-runtime && electron-builder --config electron-builder.static.json --win dir --x64",
     "package:win:legacy": "npm run build:web && npm run prepare:desktop-runtime && electron-builder --config electron-builder.legacy.json --win portable --x64",
     "package:win:legacy:nsis": "npm run build:web && npm run prepare:desktop-runtime && electron-builder --config electron-builder.legacy.json --win nsis --x64",
