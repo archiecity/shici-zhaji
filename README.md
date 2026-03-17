@@ -79,12 +79,15 @@ npm run fetch:gushiwen    # 抓取古诗文网补全数据
 npm run convert:vmijunv   # 转换 vmijunv 原始数据
 npm run import -- <file>  # 导入本地诗词（json/txt）
 npm run build:index:sqlite # 从 manifest + shards 构建 SQLite 全量诗词库（public/data/poems-index.db）
-npm run generate          # 生成 index/manifest/shards 并刷新 SQLite 索引库
+npm run generate:full     # 生成完整版（全量数据）并刷新 SQLite 索引库
+npm run generate:mini     # 生成 mini 版（仅 annotation 非空）并刷新 SQLite 索引库
+npm run generate          # 等同 generate:full（兼容旧命令）
 
 # 桌面端（Windows）
 npm run desktop:run                # 静态桌面模式本地运行（推荐）
 npm run package:win                # 静态桌面模式：Windows 安装版（NSIS）
 npm run package:win:zip            # 静态桌面模式：Windows ZIP 解压即用版（推荐分发）
+npm run package:win:zip:mini       # mini 数据集 ZIP（文件名带 -mini 后缀，不覆盖 full 包）
 npm run package:win:dir            # 静态桌面模式：输出 win-unpacked 目录
 npm run package:win:portable       # 静态桌面模式：Windows 便携版
 
@@ -101,6 +104,7 @@ npm run package:win:legacy:nsis    # 旧链路安装版
 - `dist-desktop/installers/`  
   - `诗词札记-<version>.exe`（NSIS 安装包或便携包，取决于命令）
   - `诗词札记-<version>.zip`（ZIP 解压即用版，若启用 `package:win:zip`）
+  - `诗词札记-<version>-mini.zip`（mini 数据集 ZIP，若启用 `package:win:zip:mini`）
   - `win-unpacked/`（解包目录，可用于调试）
 
 启动速度说明：

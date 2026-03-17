@@ -50,9 +50,13 @@ function main() {
   const builderConfig = JSON.parse(fs.readFileSync(path.join(ROOT, 'electron-builder.static.json'), 'utf8'))
   const productName = builderConfig.productName || pkg.name
   const version = pkg.version
+  const rawSuffix = String(process.env.SHICI_ZIP_SUFFIX || '').trim()
+  const normalizedSuffix = rawSuffix
+    ? (rawSuffix.startsWith('-') ? rawSuffix : `-${rawSuffix}`)
+    : ''
 
   const exePath = path.join(WIN_UNPACKED_DIR, `${productName}.exe`)
-  const zipPath = path.join(INSTALLERS_DIR, `${productName}-${version}.zip`)
+  const zipPath = path.join(INSTALLERS_DIR, `${productName}-${version}${normalizedSuffix}.zip`)
 
   if (!fs.existsSync(ICON_PATH)) {
     throw new Error(`icon not found: ${ICON_PATH}`)

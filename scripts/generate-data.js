@@ -1,8 +1,11 @@
 /**
  * 数据构建脚本（多源版）
  *
- * 用法：node scripts/generate-data.js
+ * 用法：node scripts/generate-data.js [--profile full|mini] [--exclude-vm-catalog]
  * 选项：
+ *   --profile <full|mini>  数据构建档位（默认 full）
+ *                          full: 全量数据
+ *                          mini: 仅保留 annotation 非空的诗词
  *   --exclude-vm-catalog   不将 vmijunv 转换数据并入主库（仅用于补全）
  *
  * 数据来源（按优先级扫描，后者不覆盖前者）：
@@ -79,6 +82,36 @@ function scanSourceDir(dir) {
 
 function appendAll(target, source) {
   for (const item of source) target.push(item)
+}
+
+function parseProfile(args) {
+  const envProfile = (process.env.SHICI_DATA_PROFILE || process.env.SHICI_PROFILE || '')
+    .trim()
+    .toLowerCase()
+  let cliProfile = ''
+
+  for (let i = 0; i < args.length; i++) {
+    const arg = args[i]
+    if (arg === '--profile') {
+      cliProfile = String(args[i + 1] || '').trim().toLowerCase()
+      continue
+    }
+    if (arg.startsWith('--profile=')) {
+      cliProfile = arg.slice('--profile='.length).trim().toLowerCase()
+      continue
+    }
+  }
+
+  const profile = cliProfile || envProfile || 'full'
+  if (profile !== 'full' && profile !== 'mini') {
+    throw new Error(`不支持的 profile: ${profile}（可选: full | mini）`)
+  }
+  return profile
+}
+
+function hasNonEmptyAnnotation(poem) {
+  if (!Array.isArray(poem.annotation)) return false
+  return poem.annotation.some(line => String(line || '').trim().length > 0)
 }
 
 // ============ 繁简转换 ============
@@ -170,9 +203,11 @@ function convertPoem(poem, t2s) {
 async function main() {
   const args = process.argv.slice(2)
   const includeVmCatalog = !args.includes('--exclude-vm-catalog')
+  const profile = parseProfile(args)
 
   console.log('=== 扫描数据源 ===')
   console.log(`  include-vm-catalog: ${includeVmCatalog}`)
+  console.log(`  profile: ${profile}`)
 
   const localPoems = loadLocalSource()
   console.log(`  local (poems-source.json): ${localPoems.length} 首`)
@@ -286,7 +321,27 @@ async function main() {
   }
   console.log(`  补充了 ${enriched} 首诗的赏析/注释/译文`)
 
-  // ============ 4. 生成索引 ============
+  // ============ 4. 生成档位过滤 ============
+  console.log('\n=== 应用构建档位 ===')
+  const totalBeforeProfile = allPoems.length
+  let profileFilteredOut = 0
+  let outputPoems = allPoems
+
+  if (profile === 'mini') {
+    outputPoems = allPoems.filter(hasNonEmptyAnnotation)
+    profileFilteredOut = totalBeforeProfile - outputPoems.length
+    console.log(`  mini 模式：仅保留注释非空诗词，过滤 ${profileFilteredOut} 首`)
+  } else {
+    console.log('  full 模式：保留全量诗词')
+  }
+
+  if (outputPoems.length === 0) {
+    console.log('过滤后没有诗词数据，退出。')
+    process.exit(0)
+  }
+  console.log(`  输出总量: ${outputPoems.length} 首`)
+
+  // ============ 5. 生成索引 ============
 
   console.log('\n=== 生成输出 ===')
 
@@ -307,8 +362,8 @@ async function main() {
   const shardMeta = []
   const index = []
 
-  for (let i = 0; i < allPoems.length; i += SHARD_SIZE) {
-    const chunk = allPoems.slice(i, i + SHARD_SIZE)
+  for (let i = 0; i < outputPoems.length; i += SHARD_SIZE) {
+    const chunk = outputPoems.slice(i, i + SHARD_SIZE)
     const shardIdx = Math.floor(i / SHARD_SIZE)
     const shardFile = `s-${shardIdx}.json`
 
@@ -344,16 +399,19 @@ async function main() {
 
   const indexPath = path.join(PUBLIC_DATA, 'index.json')
   fs.writeFileSync(indexPath, JSON.stringify(index))
-  console.log(`  index.json: ${allPoems.length} 条 (${(fs.statSync(indexPath).size / 1024).toFixed(1)}KB)`)
+  console.log(`  index.json: ${outputPoems.length} 条 (${(fs.statSync(indexPath).size / 1024).toFixed(1)}KB)`)
 
   // 清单
-  const dynasties = [...new Set(allPoems.map(p => p.dynasty).filter(Boolean))]
-  const authors = [...new Set(allPoems.map(p => p.author).filter(Boolean))]
-  const tags = [...new Set(allPoems.flatMap(p => p.tags || []).filter(Boolean))]
-  const sources = [...new Set(allPoems.map(p => p.source).filter(Boolean))]
+  const dynasties = [...new Set(outputPoems.map(p => p.dynasty).filter(Boolean))]
+  const authors = [...new Set(outputPoems.map(p => p.author).filter(Boolean))]
+  const tags = [...new Set(outputPoems.flatMap(p => p.tags || []).filter(Boolean))]
+  const sources = [...new Set(outputPoems.map(p => p.source).filter(Boolean))]
 
   const manifest = {
-    total: allPoems.length,
+    total: outputPoems.length,
+    profile,
+    totalBeforeProfile,
+    filteredOutByProfile: profileFilteredOut,
     shardSize: SHARD_SIZE,
     shards: shardMeta,
     dynasties,
