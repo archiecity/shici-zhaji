@@ -241,7 +241,7 @@ export default function GroupManager() {
             {!isBuiltinAnnotated && activeCustomGroup && (
               <button
                 onClick={() => { void removePoem(activeCustomGroup.id, poem.id) }}
-                className="absolute top-3 right-3 btn-ghost text-xs px-2 py-1 text-rose-500"
+                className="absolute bottom-3 right-3 btn-ghost text-xs px-2 py-1 text-rose-500"
               >
                 移出分组
               </button>
