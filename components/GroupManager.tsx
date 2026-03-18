@@ -188,7 +188,7 @@ export default function GroupManager() {
         <div className="card p-4">
           <p className="text-xs text-ash tracking-widest uppercase mb-2">分组说明</p>
           <p className="text-sm text-ink/70 dark:text-night-text/70 leading-relaxed">
-            「常用诗词本」为系统内置分组，自动收录有注释（annotation 非空）的诗词，支持直接浏览与背诵，不可手动重命名或删除。
+            「常用诗词本」
           </p>
         </div>
       ) : activeCustomGroup ? (
