@@ -26,3 +26,7 @@ public/data/**/*.db
 !data/examples/**
 !public/data/examples/
 !public/data/examples/**
+
+# Local-only docs
+social_post.md
+readme_yeebo.md

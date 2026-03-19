@@ -1,216 +1,231 @@
 # 诗词札记（shici-zhaji）
 
-离线古诗词学习应用，支持检索、阅读、背诵、收藏、学习统计与分组管理。  
-项目同时提供 Web 运行方式和 Windows 桌面端打包能力。
-该项目主要面向诗词爱好者、学生、教师等需要离线学习古诗词、古文的人群。
-mini版本内置8500首诗词，均有注释、赏析、译文(少部分缺少译文)，并内置“高中必背诗词分组”
-full版本内置68万首诗词，绝大部分没有注释等信息，且占用磁盘空间较大
-## to使用者
+> 一个可离线使用的古诗词学习应用：支持查诗、阅读注释、背诵训练、收藏分组与学习统计。  
+> 适用于学生背诵、教师备课、古诗词爱好者日常学习。
 
-### 功能概览
+## 📖 项目简介
 
-- 今日诗词、随机诗词、继续学习入口
-- 按朝代/作者/主题分类浏览，支持关键词搜索
-- 诗词详情页支持注释、译文、赏析切换
-- 背诵练习 4 种模式：阅读、遮挡、逐句、自测
-- 学习记录：收藏、记忆状态、复习次数、最近学习
-- 分组管理：新建分组、重命名、删除、将诗词加入或移出分组
+**诗词札记**是一个面向中文古诗词学习场景的多端应用，目标是解决以下问题：
 
-### 如何使用（Windows）
+- 诗词资料分散，查找和复习成本高
+- 网络不稳定时无法顺畅学习
+- 背诵训练缺少系统记录（收藏、掌握状态、复习次数等）
 
-1. 获取安装包或便携版，请使用网盘链接，也可直接联系开发者。若拉取仓库使用指令下载，安装包位于 `dist-desktop/installers/` 或 Release 页面）。
-2. 双击运行 `诗词札记-Setup-<version>.exe`（安装版）或 `诗词札记-<version>.exe`（便携版）。
-3. 首次打开后即可离线使用，无需联网查询诗词内容。
+适用人群：
 
-### 数据保存位置
+- 需要背诵古诗词的学生
+- 需要课堂素材的教师
+- 希望系统化阅读与积累的诗词爱好者
 
-- 桌面端学习数据默认保存在系统用户目录下（`userData/study.db`）。
-- 若 SQLite 不可用，会回退到 `userData/study-fallback.json`。
-- Web 模式下学习数据保存在浏览器 `localStorage`。
+平台支持：
 
-### 常见问题
+- **Windows 桌面端**
+- **Web 网页端**
+- **Android 移动端**
 
-- 打开后提示“加载失败”：通常是运行时数据缺失或损坏，建议重新生成或重新安装打包产物。
-- 背诵范围里看不到自定义分组：请先在诗词详情页将诗词加入分组，再进入背诵页选择范围。
+---
 
-## 若拉取该仓库
+## ✨ 核心功能
 
-### 技术栈
+- **离线学习**：核心诗词数据可本地使用
+- **多入口学习**：今日诗词、随机诗词、继续学习
+- **多维检索**：按朝代 / 作者 / 主题筛选
+- **全文搜索**：支持搜索诗名、作者、标签、诗句内容
+- **分层阅读**：原文 / 注释 / 译文 / 赏析切换查看
+- **背诵训练**：阅读、遮挡、逐句、自测 4 种模式
+- **学习记录**：收藏、已掌握、最近学习、复习次数统计
+- **分组管理**：自建分组、重命名、删组、加诗入组，并可按分组背诵
+- **诗词本机制**：支持“全部诗词 / 常用诗词本”等范围学习
 
-- Next.js 14
-- React 18 + TypeScript
-- Tailwind CSS
-- Electron（桌面端）
-- Node `node:sqlite`（用于索引库与桌面学习数据）
+---
+
+## 🖥️ 多端支持说明
+
+### Windows 桌面端
+
+适合人群：
+
+- 需要长期离线学习、希望有稳定本地体验的用户
+
+使用方式：
+
+- 普通用户：从发布渠道下载安装包或便携版后直接使用
+- 开发者：可从源码构建（见下方开发者指南）
+
+---
+
+### Web 网页端
+
+访问方式：
+
+- 若已有部署地址：直接浏览器访问即可
+- 若无部署地址：可按开发者指南本地启动（默认 `http://localhost:3000`）
+
+是否需要部署：
+
+- 普通使用者如果有现成地址，**不需要自己部署**
+- 仓库本身**不包含固定公网地址**
+
+---
+
+### Android 移动端
+
+安装方式：
+
+- 使用发布提供的 APK（若发布渠道提供）
+- 或由开发者本地构建 APK 安装
+
+使用场景：
+
+- 通勤、碎片时间背诵与复习
+- 当前移动端构建链路仅支持 `mini` 数据档位
+
+---
+
+## 🚀 快速开始（面向普通用户）
+
+### Windows（推荐）
+1. 下载桌面端安装包或便携版。  
+2. 双击安装/运行。  
+3. 打开应用后直接开始学习。  
+
+### Web
+1. 打开部署好的网页地址。  
+2. 进入首页后即可使用检索、阅读和背诵功能。  
+
+### Android
+1. 安装 APK。  
+2. 打开应用后按“首页 → 分类/背诵”开始使用。  
+
+---
+
+## 🧑‍💻 开发者指南
 
 ### 环境要求
 
-- Node.js 22+（推荐 24+）
+- Node.js **22+**（推荐 24+）
 - npm
-- 打包链路在 Linux 下额外依赖 `wine`/`wine64`（用于图标写入）
+- Android 构建需要 Android SDK / Java（如需打包 Android）
+- Linux 下构建 Windows 安装包通常需要 `wine/wine64`
 
-### 快速开始（Web）
+### 本地运行
+
+#### 1) 克隆仓库并安装依赖
 
 ```bash
+git clone <your-repo-url>
+cd shici-zhaji
 npm install
-npm run generate
+```
+
+#### 2) 生成本地数据（推荐先用 mini）
+
+```bash
+npm run generate:mini
+```
+
+如需全量数据：
+
+```bash
+npm run generate:full
+```
+
+#### 3) 启动 Web 开发服务
+
+```bash
 npm run dev
 ```
 
-说明：
+访问：`http://localhost:3000`
 
-- `npm run generate` 默认等同 `generate:full`，会生成 `public/data` 下索引、分片和 SQLite 索引库。
-- 开发启动后访问 `http://localhost:3000`。
-
-### 快速开始（桌面端本地运行）
+#### 4) 启动桌面端（本地联调）
 
 ```bash
 npm run desktop:run
 ```
 
-该命令会自动执行：
-
-1. 构建诗词 SQLite 索引
-2. 构建桌面静态前端
-3. 准备 Electron 静态运行时
-4. 启动 Electron 主进程
-
-### 数据构建档位
-
-- `full`：全量数据
-- `mini`：仅保留有注释（`annotation` 非空）的诗词
-
-### 扩展默认诗词本
-
-默认诗词本配置位于 `lib/poem-notebooks.json`。  
-新增诗词本只需追加一个条目（无需修改核心查询/背诵/分组逻辑），例如：
-
-```json
-{
-  "id": "tang-song",
-  "name": "唐宋诗词本",
-  "description": "仅保留唐宋诗词",
-  "rule": {
-    "dynasties": ["唐", "宋"]
-  }
-}
-```
-
-可选规则字段：
-
-- `requireAnnotation`: `true/false`
-- `dynasties`: 朝代白名单
-- `authors`: 作者白名单
-- `tagsAny`: 标签任一命中
-- `sources`: 数据来源白名单
-
-删除某个条目即可下线该诗词本（例如删除 `plain` 后，前端不再显示“纯原文诗词本”）。
-
-常用命令：
+#### 5) Android（可选）
 
 ```bash
-npm run generate:full
-npm run generate:mini
-npm run build:index:sqlite
-```
-
-### 数据抓取与导入（可选）
-
-```bash
-npm run fetch
-npm run fetch:gushiwen
-npm run convert:vmijunv
-npm run import -- <json-file>
-```
-
-### Windows 打包
-
-```bash
-npm run package:win           # NSIS 安装包
-npm run package:win:portable  # 便携版 exe
-npm run package:win:zip       # ZIP
-npm run package:win:zip:mini  # mini 数据 + ZIP
-npm run package:win:dir       # 仅输出 win-unpacked
-```
-
-打包产物目录：`dist-desktop/installers/`
-
-### 移动端打包（Capacitor，mini 离线包）
-
-说明：
-
-- 当前移动端仅支持 `mini` 数据档位（已内置校验，非 mini 会直接报错退出）。
-- 移动端静态包会移除无用的 `data/poems-index.db`，减小体积。
-- 查询/全文检索逻辑遵循桌面端现有逻辑（静态离线桥接）。
-
-首次准备（仅一次）：
-
-```bash
-npm install
 npm run mobile:android:add
-npm run mobile:android:signing:prepare
-```
-
-`mobile:android:signing:prepare` 会在 `android/keystore/` 下自动生成本地 release keystore，
-并写入 `android/release-signing.properties`（默认仅本机开发使用）。
-
-生成并同步 mini 离线 Web 资源到 Android 工程：
-
-```bash
 npm run mobile:android:sync:mini
-```
-
-产出 Android 调试包（APK）：
-
-```bash
 npm run mobile:android:apk:debug
 ```
 
-调试 APK 输出路径：
+---
+
+### 项目结构（简要）
 
 ```text
-android/app/build/outputs/apk/debug/app-debug.apk
-```
-
-产出 Android 发布包（APK）：
-
-```bash
-npm run mobile:android:apk:release
-```
-
-一键生成并签名发布包（mini）：
-
-```bash
-npm run mobile:android:apk:release:auto
-```
-
-已完成一次 mini 资源构建后，快速重打 release（跳过数据重建）：
-
-```bash
-npm run mobile:android:apk:release:quick
-```
-
-### 目录结构
-
-```text
-app/                 Next.js 页面与 API 路由
+app/                 Next.js 页面与 API 路由（Web 主体）
 components/          UI 组件
-hooks/               业务 hooks（学习状态、分组、背诵范围等）
-lib/                 数据访问、类型、存储抽象
-electron/            Electron 主进程、preload、桌面存储服务
-scripts/             数据生成与打包脚本
-data/                源数据与抓取数据
+hooks/               学习状态、背诵范围等业务 hooks
+lib/                 数据访问、类型定义、存储逻辑、诗词本规则
+electron/            桌面端主进程与本地服务桥接
+android/             Android 工程（Capacitor）
+scripts/             数据生成、抓取、构建与打包脚本
 public/data/         运行时诗词数据（manifest/index/shards/sqlite）
-dist-desktop/        桌面端构建与打包输出
+data/                源数据与抓取数据目录
 ```
 
-### 校验建议
+---
+
+## ⚙️ 配置说明（如有）
+
+### 1) 诗词本配置
+
+文件：`lib/poem-notebooks.json`  
+用途：定义可选学习范围（如“常用诗词本”“唐宋诗词本”）。
+
+### 2) 常用环境变量（按需）
+
+- `SHICI_DATA_PROFILE=mini|full`：数据构建档位
+- `NEXT_PUBLIC_SHICI_LOCAL_DATA=1`：启用本地静态数据桥接（部分静态构建流程使用）
+- `SHICI_JAVA_HOME`：Android Gradle 使用的 Java 路径
+- `SHICI_ANDROID_STORE_FILE` / `SHICI_ANDROID_STORE_PASSWORD` / `SHICI_ANDROID_KEY_ALIAS` / `SHICI_ANDROID_KEY_PASSWORD`：Android 发布签名配置
+- `SHICI_KEEP_INDEX_JSON=1`、`SHICI_KEEP_SHARDS=1`：桌面静态运行时裁剪控制（打包场景）
+
+---
+
+## 🤝 参与贡献
+
+欢迎 Issue 和 PR。
+
+建议流程：
+
+1. Fork 仓库并新建分支（如 `feat/xxx`、`fix/xxx`）
+2. 完成修改并本地验证
+3. 提交 PR，说明变更目的、影响范围、验证方式
+4. 如涉及 UI 变更，建议附截图或录屏
+
+基础自检建议：
 
 ```bash
 npx tsc --noEmit
 node --check electron/study-service.cjs
 ```
 
-注意：
+---
 
-- 当前仓库若未初始化 ESLint，`npm run lint` 会进入 Next.js 交互式配置，不适合无交互 CI 直接使用。
+## ❓ 常见问题（FAQ）
+
+### Q1：启动后提示“加载失败”？
+通常是运行时数据未生成或损坏。先执行：
+
+```bash
+npm run generate:mini
+```
+
+然后重启服务/应用。
+
+### Q2：`build:index:sqlite` 失败，提示 `node:sqlite` 不支持？
+请升级 Node.js 至 22+（推荐 24+）。
+
+### Q3：`npm run lint` 为什么会进入交互式配置？
+当前仓库的 lint 流程可能触发 Next.js 的 ESLint 初始化向导，不适合直接用于无交互 CI。
+
+### Q4：背诵范围里看不到自定义分组？
+先在诗词详情页将诗词加入分组，再进入背诵页选择该分组。
+
+### Q5：Android 构建为什么要求 mini？
+移动端静态构建流程当前仅支持 `mini` 档位，非 mini 会直接报错退出。
