@@ -150,6 +150,20 @@ export default function MinePage() {
             )}
           </div>
         )}
+
+        <p className="mt-10 text-center text-xs text-ash/90">
+          本应用为开源免费项目，开源地址
+          {' '}
+          <a
+            href="https://github.com/yeebo3/shici-zhaji"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="underline underline-offset-2 hover:text-ink/75 dark:hover:text-night-text/75"
+          >
+            https://github.com/yeebo3/shici-zhaji
+          </a>
+          。
+        </p>
       </main>
     </div>
   )
