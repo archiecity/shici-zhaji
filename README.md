@@ -50,6 +50,13 @@
 
 ---
 
+## 📦 数据来源（感谢开源）
+
+- **诗词数据1**：https://github.com/chinese-poetry/chinese-poetry
+- **诗词数据2**：https://github.com/VMIJUNV/chinese-poetry-and-prose
+
+---
+
 ## 🖥️ 多端支持说明
 
 ### Windows 桌面端
