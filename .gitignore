@@ -30,3 +30,5 @@ public/data/**/*.db
 # Local-only docs
 social_post.md
 readme_yeebo.md
+
+docs_4c/
