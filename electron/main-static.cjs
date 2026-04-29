@@ -4,6 +4,7 @@ const http = require('node:http')
 const path = require('node:path')
 const { createPoemsService } = require('./poems-service.cjs')
 const { createStudyService } = require('./study-service.cjs')
+const { createAiSettingsService } = require('./ai-settings-service.cjs')
 
 process.env.SHICI_DESKTOP_RUNTIME = 'static'
 
@@ -15,6 +16,7 @@ if (!Number.isFinite(STATIC_SERVER_PORT) || STATIC_SERVER_PORT <= 0 || STATIC_SE
 let mainWindow = null
 let poemsService = null
 let studyService = null
+let aiSettingsService = null
 let staticServer = null
 
 const CONTENT_TYPES = {
@@ -161,7 +163,7 @@ function stopStaticServer() {
   staticServer = null
 }
 
-function registerIpcHandlers(poems, study) {
+function registerIpcHandlers(poems, study, aiSettings) {
   ipcMain.handle('poems:query', async (_event, query) => {
     return poems.queryPoemIndex(query || {})
   })
@@ -303,6 +305,26 @@ function registerIpcHandlers(poems, study) {
   ipcMain.handle('study:getGroupsForPoem', async (_event, poemId) => {
     return study.getGroupsForPoem(String(poemId || ''))
   })
+
+  ipcMain.handle('ai-settings:getStatus', async () => {
+    return aiSettings.getStatus()
+  })
+
+  ipcMain.handle('ai-settings:save', async (_event, settings) => {
+    return aiSettings.saveSettings(settings || {})
+  })
+
+  ipcMain.handle('ai-settings:clear', async () => {
+    return aiSettings.clearSettings()
+  })
+
+  ipcMain.handle('ai-settings:test', async (_event, settings) => {
+    return aiSettings.testSettings(settings || {})
+  })
+
+  ipcMain.handle('ai:generatePoem', async (_event, payload) => {
+    return aiSettings.generatePoem(payload || {})
+  })
 }
 
 function createMainWindow(url) {
@@ -350,7 +372,8 @@ app.whenReady().then(async () => {
     const dataDir = resolveDataDir(runtimeRoot)
     poemsService = createPoemsService({ dataDir })
     studyService = createStudyService({ userDataDir: app.getPath('userData') })
-    registerIpcHandlers(poemsService, studyService)
+    aiSettingsService = createAiSettingsService({ userDataDir: app.getPath('userData') })
+    registerIpcHandlers(poemsService, studyService, aiSettingsService)
 
     const url = await startStaticServer(runtimeRoot)
     createMainWindow(url)

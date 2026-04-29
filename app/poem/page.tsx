@@ -6,9 +6,10 @@ import Link from 'next/link'
 import Navbar from '@/components/Navbar'
 import Loading from '@/components/Loading'
 import GroupPicker from '@/components/GroupPicker'
+import AiAssistBlock from '@/components/AiAssistBlock'
 import { getPoemById } from '@/lib/poems'
-import { Poem, ViewMode } from '@/lib/types'
-import { markViewed } from '@/lib/storage'
+import { Poem, StudyRecord, ViewMode } from '@/lib/types'
+import { getStudyRecord, markViewed } from '@/lib/storage'
 import { useFavorite, useFontSize } from '@/hooks/useStudy'
 import { useAndroidBackToPath } from '@/hooks/useAndroidBackToPath'
 import {
@@ -65,6 +66,7 @@ function PoemDetailPageContent() {
   const from = searchParams.get('from')
   const backTarget = from && from.startsWith('/') && from !== pathname ? from : null
   const [poem, setPoem] = useState<Poem | null>(null)
+  const [studyRecord, setStudyRecord] = useState<StudyRecord | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [viewMode, setViewMode] = useState<ViewMode>('original')
@@ -79,6 +81,7 @@ function PoemDetailPageContent() {
     async function load() {
       if (!id) {
         setPoem(null)
+        setStudyRecord(null)
         setError('缺少诗词参数')
         setLoading(false)
         return
@@ -91,9 +94,15 @@ function PoemDetailPageContent() {
         const p = await getPoemById(id, shardHint)
         if (p) {
           setPoem(p)
-          void markViewed(id, shardHint)
+          try {
+            await markViewed(id, shardHint)
+            setStudyRecord(await getStudyRecord(id))
+          } catch {
+            setStudyRecord(null)
+          }
         } else {
           setPoem(null)
+          setStudyRecord(null)
         }
       } catch (e) {
         const msg = e instanceof Error ? e.message : '数据加载失败'
@@ -229,6 +238,14 @@ function PoemDetailPageContent() {
                 <p key={i} className="text-sm text-ink/70 dark:text-night-text/70 leading-relaxed">{note}</p>
               ))}
             </div>
+            <AiAssistBlock
+              task="annotation"
+              title="AI 补充注释"
+              buttonLabel="生成注释"
+              poem={poem}
+              studyRecord={studyRecord}
+              className="mt-3"
+            />
           </section>
         )}
 
@@ -249,6 +266,14 @@ function PoemDetailPageContent() {
             <div className="card p-5">
               <p className="text-sm text-ink/70 dark:text-night-text/70 leading-relaxed">{poem.appreciation}</p>
             </div>
+            <AiAssistBlock
+              task="analysis"
+              title="AI 补充赏析"
+              buttonLabel="生成赏析"
+              poem={poem}
+              studyRecord={studyRecord}
+              className="mt-3"
+            />
           </section>
         )}
 

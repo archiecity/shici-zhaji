@@ -75,17 +75,22 @@ function main() {
   }
 
   const wineCmd = commandExists('wine64') ? 'wine64' : 'wine'
-  if (!commandExists(wineCmd)) {
-    throw new Error('wine64/wine is required to patch exe icon')
+  if (commandExists(wineCmd)) {
+    try {
+      const rcedit = resolveRceditX64()
+      const wineEnv = {
+        ...process.env,
+        XDG_RUNTIME_DIR: process.env.XDG_RUNTIME_DIR || '/tmp',
+        WINEDEBUG: process.env.WINEDEBUG || '-all',
+      }
+      run(wineCmd, [rcedit, exePath, '--set-icon', ICON_PATH], { env: wineEnv })
+    } catch (error) {
+      const msg = error instanceof Error ? error.message : String(error)
+      console.warn(`[package-win-zip] skip explicit icon patch: ${msg}`)
+    }
+  } else {
+    console.warn('[package-win-zip] skip explicit icon patch: wine64/wine not found')
   }
-
-  const rcedit = resolveRceditX64()
-  const wineEnv = {
-    ...process.env,
-    XDG_RUNTIME_DIR: process.env.XDG_RUNTIME_DIR || '/tmp',
-    WINEDEBUG: process.env.WINEDEBUG || '-all',
-  }
-  run(wineCmd, [rcedit, exePath, '--set-icon', ICON_PATH], { env: wineEnv })
 
   if (fs.existsSync(zipPath)) {
     fs.rmSync(zipPath)

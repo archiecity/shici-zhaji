@@ -4,10 +4,11 @@ import { Suspense, useEffect, useMemo, useRef, useState } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import Navbar from '@/components/Navbar'
 import Loading from '@/components/Loading'
+import AiAssistBlock from '@/components/AiAssistBlock'
 import { getPoemById, getPoemIndexById, getPoemNotebooks, getRandomPoemIndex } from '@/lib/poems'
-import { Poem, PoemGroup, PoemNotebook, ReciteMode, ReciteScopeId } from '@/lib/types'
+import { Poem, PoemGroup, PoemNotebook, ReciteMode, ReciteScopeId, StudyRecord } from '@/lib/types'
 import { DEFAULT_RECITE_NOTEBOOK_ID } from '@/lib/notebooks'
-import { getPoemGroups, markMemorized, markViewed } from '@/lib/storage'
+import { getPoemGroups, getStudyRecord, markMemorized, markViewed } from '@/lib/storage'
 import { useReciteNotebook } from '@/hooks/useStudy'
 import { useAndroidBackToPath } from '@/hooks/useAndroidBackToPath'
 import {
@@ -89,6 +90,7 @@ function RecitePageContent() {
   const shardHint = parseShardHint(searchParams.get('s'))
   const [entryFrom, setEntryFrom] = useState('/')
   const [poem, setPoem] = useState<Poem | null>(null)
+  const [studyRecord, setStudyRecord] = useState<StudyRecord | null>(null)
   const [groups, setGroups] = useState<PoemGroup[]>([])
   const [notebooks, setNotebooks] = useState<PoemNotebook[]>([])
   const [loading, setLoading] = useState(true)
@@ -106,6 +108,7 @@ function RecitePageContent() {
     async function load() {
       if (!id) {
         setPoem(null)
+        setStudyRecord(null)
         setError('缺少诗词参数')
         setLoading(false)
         return
@@ -118,9 +121,15 @@ function RecitePageContent() {
         const p = await getPoemById(id, shardHint)
         if (p) {
           setPoem(p)
-          void markViewed(id, shardHint)
+          try {
+            await markViewed(id, shardHint)
+            setStudyRecord(await getStudyRecord(id))
+          } catch {
+            setStudyRecord(null)
+          }
         } else {
           setPoem(null)
+          setStudyRecord(null)
         }
       } catch (e) {
         const msg = e instanceof Error ? e.message : '数据加载失败'
@@ -279,6 +288,8 @@ function RecitePageContent() {
     const task = previousTask
       .catch(() => undefined)
       .then(() => markMemorized(poem.id, memorized))
+      .then(() => getStudyRecord(poem.id))
+      .then(record => { setStudyRecord(record) })
       .then(() => undefined)
       .catch(() => undefined)
     pendingMarkRef.current = task
@@ -368,6 +379,7 @@ function RecitePageContent() {
 
   const canPrevSentence = mode === 'line' && currentSentence > 0
   const canNextSentence = mode === 'line' && currentSentence < totalSentences - 1
+  const currentScope = scopeOptions.find(item => item.id === notebook)
 
   return (
     <div className="min-h-screen">
@@ -505,6 +517,20 @@ function RecitePageContent() {
             {result === 'memorized' ? '已标记为"记住了"，继续保持！' : '没关系，多复习几次就好了。'}
           </div>
         )}
+
+        <AiAssistBlock
+          task="recitation"
+          title="AI 背诵建议"
+          buttonLabel="生成建议"
+          poem={poem}
+          studyRecord={studyRecord}
+          recite={{
+            mode,
+            scope: notebook,
+            scopeName: currentScope?.name,
+          }}
+          className="mb-6"
+        />
 
         <div className="flex justify-center gap-3 pb-8">
           <button onClick={handleMemorized} className="btn-primary flex items-center gap-1.5">

@@ -4,6 +4,7 @@ node_modules/
 out/
 .desktop-build-temp/
 .env*
+!.env.example
 *.log
 *.tsbuildinfo
 dist-desktop/
@@ -32,3 +33,5 @@ social_post.md
 readme_yeebo.md
 
 docs_4c/
+dist-mobile/
+.codex

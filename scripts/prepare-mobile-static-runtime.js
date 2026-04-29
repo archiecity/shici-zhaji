@@ -24,8 +24,16 @@ function main() {
   ensureExists(MANIFEST_PATH, 'manifest')
 
   const manifest = JSON.parse(fs.readFileSync(MANIFEST_PATH, 'utf8'))
-  if (manifest.profile !== 'mini') {
-    throw new Error(`mobile build only supports mini profile, got: ${String(manifest.profile || '')}`)
+  const profile = String(manifest.profile || '')
+  const requestedProfile = process.env.SHICI_MOBILE_PROFILE || 'mini'
+  if (profile !== 'mini' && profile !== 'full') {
+    throw new Error(`mobile build only supports mini/full profile, got: ${profile}`)
+  }
+  if (profile === 'full' && requestedProfile !== 'full') {
+    throw new Error('full mobile build requires SHICI_MOBILE_PROFILE=full')
+  }
+  if (requestedProfile === 'full' && profile !== 'full') {
+    throw new Error(`requested full mobile build, got: ${profile}`)
   }
 
   if (fs.existsSync(SQLITE_PATH)) {
@@ -39,7 +47,7 @@ function main() {
     console.log('[mobile] removed data/examples')
   }
 
-  console.log(`[mobile] static runtime prepared (mini profile): ${STATIC_DIR}`)
+  console.log(`[mobile] static runtime prepared (${profile} profile): ${STATIC_DIR}`)
 }
 
 main()

@@ -5,6 +5,7 @@ import Navbar from '@/components/Navbar'
 import PoemCard from '@/components/PoemCard'
 import Loading from '@/components/Loading'
 import GroupManager from '@/components/GroupManager'
+import AiSettingsPanel from '@/components/AiSettingsPanel'
 import { useStudyStats } from '@/hooks/useStudy'
 import { getFavorites, getMemorized, getRecentlyViewed } from '@/lib/storage'
 import { getPoemIndexByIds } from '@/lib/poems'
@@ -123,6 +124,8 @@ export default function MinePage() {
             </div>
           ))}
         </div>
+
+        <AiSettingsPanel />
 
         <div className="flex gap-1 mb-6 flex-wrap">
           {tabs.map(({ key, label, icon: Icon }) => (

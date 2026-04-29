@@ -47,3 +47,16 @@ contextBridge.exposeInMainWorld('desktopStudy', {
   getPoemGroupById: groupId => invoke('study:getPoemGroupById', groupId),
   getGroupsForPoem: poemId => invoke('study:getGroupsForPoem', poemId),
 })
+
+if (runtime === 'static') {
+  contextBridge.exposeInMainWorld('desktopAiSettings', {
+    getStatus: () => invoke('ai-settings:getStatus'),
+    save: settings => invoke('ai-settings:save', settings),
+    clear: () => invoke('ai-settings:clear'),
+    test: settings => invoke('ai-settings:test', settings),
+  })
+
+  contextBridge.exposeInMainWorld('desktopAi', {
+    generatePoem: payload => invoke('ai:generatePoem', payload),
+  })
+}
