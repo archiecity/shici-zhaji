@@ -16,10 +16,8 @@ android/release-signing.properties
 
 # Large or sensitive data artifacts
 data/**/*.json
-data/**/*.zip
 data/poems.ts
 public/data/**/*.json
-public/data/**/*.zip
 public/data/**/*.db
 
 # Keep small sample files for repository demo
@@ -35,3 +33,6 @@ readme_yeebo.md
 docs_4c/
 dist-mobile/
 .codex
+*.bak
+*.zip
+*.DS_Store
