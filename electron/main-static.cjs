@@ -360,6 +360,14 @@ function registerIpcHandlers(poems, study, aiSettings, appOrigin) {
   handle('ai:generatePoem', async (_event, payload) => {
     return aiSettings.generatePoem(payload || {})
   })
+
+  handle('ai:createImageTask', async (_event, payload) => {
+    return aiSettings.createImageTask(payload || {})
+  })
+
+  handle('ai:getAsyncResult', async (_event, taskId) => {
+    return aiSettings.getAsyncResult(String(taskId || ''))
+  })
 }
 
 function createMainWindow(url) {

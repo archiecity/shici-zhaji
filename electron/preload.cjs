@@ -58,5 +58,7 @@ if (runtime === 'static') {
 
   contextBridge.exposeInMainWorld('desktopAi', {
     generatePoem: payload => invoke('ai:generatePoem', payload),
+    createImageTask: payload => invoke('ai:createImageTask', payload),
+    getAsyncResult: taskId => invoke('ai:getAsyncResult', taskId),
   })
 }

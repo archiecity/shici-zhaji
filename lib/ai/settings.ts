@@ -1,4 +1,12 @@
-import { DEFAULT_AI_BASE_URL, DEFAULT_AI_MODEL, assertSafeAiBaseUrl, normalizeAiBaseUrl, normalizeAiModel, toChatMessages } from '@/lib/ai/compatible'
+import {
+  DEFAULT_AI_BASE_URL,
+  DEFAULT_AI_IMAGE_MODEL,
+  DEFAULT_AI_MODEL,
+  assertSafeAiBaseUrl,
+  normalizeAiBaseUrl,
+  normalizeAiModel,
+  toChatMessages,
+} from '@/lib/ai/compatible'
 import { getDesktopAiSettingsBridge } from '@/lib/ai/desktop-bridge'
 import { requestNativeChatCompletion } from '@/lib/ai/native-client'
 import { AiSettings, AiSettingsInput, AiSettingsStatus, AiTestResult } from '@/lib/ai/types'
@@ -7,6 +15,7 @@ const STORAGE_PREFIX = 'shici-ai_'
 const API_KEY_KEY = 'api-key'
 const BASE_URL_KEY = 'base-url'
 const MODEL_KEY = 'model'
+const IMAGE_MODEL_KEY = 'image-model'
 const NATIVE_STORAGE_READ_TIMEOUT_MS = 4000
 const NATIVE_STORAGE_WRITE_TIMEOUT_MS = 8000
 const FALLBACK_STORAGE_PREFIX = `${STORAGE_PREFIX}fallback_`
@@ -81,6 +90,7 @@ function getNativeFallbackSettings(): AiSettings {
     apiKey: nativeFallbackApiKey || takeLegacyNativeFallbackApiKey(),
     baseUrl: normalizeAiBaseUrl(getNativeFallbackItem(BASE_URL_KEY) || DEFAULT_AI_BASE_URL),
     model: normalizeAiModel(getNativeFallbackItem(MODEL_KEY) || DEFAULT_AI_MODEL),
+    imageModel: normalizeAiModel(getNativeFallbackItem(IMAGE_MODEL_KEY) || DEFAULT_AI_IMAGE_MODEL),
   }
 }
 
@@ -90,6 +100,7 @@ function getNativeFallbackStatus(warning = FALLBACK_WARNING): AiSettingsStatus {
     hasApiKey: Boolean(settings.apiKey),
     baseUrl: settings.baseUrl,
     model: settings.model,
+    imageModel: settings.imageModel,
     source: 'native',
     editable: true,
     secure: false,
@@ -102,10 +113,12 @@ function saveNativeFallbackSettings(input: AiSettingsInput): AiSettingsStatus {
   const apiKey = input.apiKey?.trim() || existing.apiKey
   const baseUrl = assertSafeAiBaseUrl(input.baseUrl)
   const model = normalizeAiModel(input.model)
+  const imageModel = normalizeAiModel(input.imageModel || existing.imageModel || DEFAULT_AI_IMAGE_MODEL)
   nativeFallbackApiKey = apiKey
   setNativeFallbackItem(API_KEY_KEY, '')
   setNativeFallbackItem(BASE_URL_KEY, baseUrl)
   setNativeFallbackItem(MODEL_KEY, model)
+  setNativeFallbackItem(IMAGE_MODEL_KEY, imageModel)
   return getNativeFallbackStatus()
 }
 
@@ -114,19 +127,22 @@ function clearNativeFallbackSettings(): void {
   setNativeFallbackItem(API_KEY_KEY, '')
   setNativeFallbackItem(BASE_URL_KEY, '')
   setNativeFallbackItem(MODEL_KEY, '')
+  setNativeFallbackItem(IMAGE_MODEL_KEY, '')
 }
 
 async function getSecureNativeSettings(): Promise<AiSettings> {
   const storage = await getSecureStorage()
-  const [apiKey, baseUrl, model] = await Promise.all([
+  const [apiKey, baseUrl, model, imageModel] = await Promise.all([
     storage.getItem(API_KEY_KEY),
     storage.getItem(BASE_URL_KEY),
     storage.getItem(MODEL_KEY),
+    storage.getItem(IMAGE_MODEL_KEY),
   ])
   return {
     apiKey: apiKey || '',
     baseUrl: normalizeAiBaseUrl(baseUrl || DEFAULT_AI_BASE_URL),
     model: normalizeAiModel(model || DEFAULT_AI_MODEL),
+    imageModel: normalizeAiModel(imageModel || DEFAULT_AI_IMAGE_MODEL),
   }
 }
 
@@ -159,6 +175,7 @@ async function getNativeStatus(): Promise<AiSettingsStatus> {
       hasApiKey: Boolean(settings.apiKey),
       baseUrl: settings.baseUrl,
       model: settings.model,
+      imageModel: settings.imageModel,
       source: 'native',
       editable: true,
       secure: true,
@@ -171,6 +188,7 @@ async function getNativeStatus(): Promise<AiSettingsStatus> {
 async function saveNativeSettings(input: AiSettingsInput): Promise<AiSettingsStatus> {
   const baseUrl = assertSafeAiBaseUrl(input.baseUrl)
   const model = normalizeAiModel(input.model)
+  const imageModel = normalizeAiModel(input.imageModel || DEFAULT_AI_IMAGE_MODEL)
   try {
     const storage = await withTimeout(
       getSecureStorage(),
@@ -182,6 +200,7 @@ async function saveNativeSettings(input: AiSettingsInput): Promise<AiSettingsSta
         input.apiKey?.trim() ? storage.setItem(API_KEY_KEY, input.apiKey.trim()) : Promise.resolve(),
         storage.setItem(BASE_URL_KEY, baseUrl),
         storage.setItem(MODEL_KEY, model),
+        storage.setItem(IMAGE_MODEL_KEY, imageModel),
       ]),
       NATIVE_STORAGE_WRITE_TIMEOUT_MS,
       '安卓安全存储保存超时。'
@@ -206,6 +225,7 @@ async function clearNativeSettings(): Promise<AiSettingsStatus> {
         storage.removeItem(API_KEY_KEY),
         storage.removeItem(BASE_URL_KEY),
         storage.removeItem(MODEL_KEY),
+        storage.removeItem(IMAGE_MODEL_KEY),
       ]),
       NATIVE_STORAGE_WRITE_TIMEOUT_MS,
       '安卓安全存储清除超时。'
@@ -225,6 +245,7 @@ async function getServerStatus(): Promise<AiSettingsStatus> {
       hasApiKey: Boolean(payload.hasApiKey),
       baseUrl: payload.baseUrl || DEFAULT_AI_BASE_URL,
       model: payload.model || DEFAULT_AI_MODEL,
+      imageModel: payload.imageModel || DEFAULT_AI_IMAGE_MODEL,
       source: 'server',
       editable: false,
       secure: true,
@@ -235,6 +256,7 @@ async function getServerStatus(): Promise<AiSettingsStatus> {
       hasApiKey: false,
       baseUrl: DEFAULT_AI_BASE_URL,
       model: DEFAULT_AI_MODEL,
+      imageModel: DEFAULT_AI_IMAGE_MODEL,
       source: 'unsupported',
       editable: false,
       secure: false,
